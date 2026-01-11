@@ -28,8 +28,8 @@ public class Events {
 	private String description;
 	private String venue;
 	private String eventDate;
-	private String totalTickets;
-	private String availableTickets;
+	private Integer totalTickets;
+	private Integer availableTickets;
 	@ManyToOne
 	@JoinColumn(name = "organizer_id")
 	private Users organizerId ;
@@ -68,16 +68,16 @@ public class Events {
 	public void setEventDate(String eventDate) {
 		this.eventDate = eventDate;
 	}
-	public String getTotalTickets() {
+	public Integer getTotalTickets() {
 		return totalTickets;
 	}
-	public void setTotalTickets(String totalTickets) {
+	public void setTotalTickets(Integer totalTickets) {
 		this.totalTickets = totalTickets;
 	}
-	public String getAvailableTickets() {
+	public Integer getAvailableTickets() {
 		return availableTickets;
 	}
-	public void setAvailableTickets(String availableTickets) {
+	public void setAvailableTickets(Integer availableTickets) {
 		this.availableTickets = availableTickets;
 	}
 	public Users getOrganizerId() {

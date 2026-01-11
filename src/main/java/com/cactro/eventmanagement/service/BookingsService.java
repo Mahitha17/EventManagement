@@ -34,6 +34,13 @@ public class BookingsService {
 	public Bookings createBooking(Events event, int ticketCount) {
 		Bookings booking = new Bookings();
 		booking.setEventId(event);
+		
+		 int bookedTickets = bookingRepo.sumTicketsByEvent(event);
+
+	        if (bookedTickets + ticketCount > event.getTotalTickets()) {
+	            throw new RuntimeException("Not enough tickets available");
+	        }
+	        
 		Users user = null;
 		if (userService.getCurrentUserDetails() instanceof UserDetailsImpl userImpl) {
 			booking.setCustomerId(userImpl.user);
