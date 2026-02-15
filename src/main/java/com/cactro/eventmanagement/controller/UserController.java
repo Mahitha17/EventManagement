@@ -1,10 +1,15 @@
 package com.cactro.eventmanagement.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,15 +41,35 @@ public class UserController {
 		
 	}
 	@PostMapping("/login")
-	public String login(@RequestBody Users user) {
+	public ResponseEntity<String> login(@RequestBody Users user) {
 		System.out.println("User in = "+user.getUsername());
-		Authentication authenticateion = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-		if(authenticateion.isAuthenticated()) {
-			UserDetails userDetails = (UserDetails) authenticateion.getPrincipal();
-			String jwtToken = jwtService.generateToken(userDetails);
-			return jwtToken;
-		}
-		return "Failed to login";
+		try {
+	        Authentication authentication =
+	            authenticationManager.authenticate(
+	                new UsernamePasswordAuthenticationToken(
+	                    user.getUsername(),
+	                    user.getPassword()
+	                )
+	            );
+
+	        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+	        String jwtToken = jwtService.generateToken(userDetails);
+	        return ResponseEntity.ok(jwtToken);
+		} catch (BadCredentialsException e) {
+	        return ResponseEntity
+	                .status(HttpStatus.UNAUTHORIZED)
+	                .body("Invalid username or password");
+
+	    } catch (LockedException e) {
+	        return ResponseEntity
+	                .status(HttpStatus.LOCKED)
+	                .body("Account is locked");
+
+	    } catch (UsernameNotFoundException e) {
+	        return ResponseEntity
+	                .status(HttpStatus.NOT_FOUND)
+	                .body("User not found");
+	    }
 		
 	}
 	

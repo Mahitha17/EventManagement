@@ -30,16 +30,26 @@ public class SecurityConfig {
 	@Autowired
 	JwtFilter jwtFilter;
 	
+//	@Bean
+//	 AuthenticationProvider authenticationProvider() {
+//		DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+//		provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
+//		return provider;
+//		
+//	}
 	@Bean
-	 AuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-		provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
-		return provider;
-		
+	AuthenticationProvider authenticationProvider() {
+	    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+	    provider.setUserDetailsService(userDetailsService);
+	    provider.setPasswordEncoder(passwordEncoder());
+	    return provider;
 	}
-	
 	@Bean
-	  SecurityFilterChain mySecurityConfig(HttpSecurity httpObj) {
+	 BCryptPasswordEncoder passwordEncoder() {
+	    return new BCryptPasswordEncoder(12);
+	}
+	@Bean
+	  SecurityFilterChain mySecurityConfig(HttpSecurity httpObj) throws Exception {
 		httpObj.csrf(c->c.disable())
 		.authorizeHttpRequests(r1->r1.requestMatchers("/register","/login").permitAll().anyRequest().authenticated())
 		.sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -50,7 +60,7 @@ public class SecurityConfig {
 	}
 	
 	@Bean
-	AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
+	AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 		return config.getAuthenticationManager();
 	}
 
